@@ -3,8 +3,14 @@ name: Update screenshot snapshots
 on:
   workflow_dispatch:
 
+# On main, which is protected, the snapshots go in a new branch with a pull
+# request, and build-and-test is started on it: pull requests opened with
+# GITHUB_TOKEN don't trigger workflows themselves. On any other branch they're
+# pushed to that branch.
 permissions:
   contents: write
+  pull-requests: write
+  actions: write
 
 jobs:
   update:
@@ -29,10 +35,23 @@ jobs:
         run: npx playwright install-deps chromium
       - run: npm run test:e2e:update
       - name: Commit updated snapshots
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src
           git diff --cached --quiet && exit 0
+          if [ "$GITHUB_REF_NAME" != main ]; then
+            git commit -m "Update Linux screenshot snapshots"
+            git push
+            exit 0
+          fi
+          branch="update-snapshots-$GITHUB_RUN_ID"
+          git switch -c "$branch"
           git commit -m "Update Linux screenshot snapshots"
-          git push
+          git push -u origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "Update Linux screenshot snapshots" \
+            --body "Snapshots from [this run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)."
+          gh workflow run build-and-test.yml --ref "$branch"
