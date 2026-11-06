@@ -8,7 +8,7 @@ export function UpdatedAgo({
   now: number
 }) {
   return (
-    <span className="text-sm text-muted-foreground" aria-live="polite">
+    <span className="w-32 text-right text-sm whitespace-nowrap text-muted-foreground tabular-nums">
       {updatedAt === null
         ? 'Loading…'
         : `Updated ${timeAgo({ from: new Date(updatedAt).toISOString(), now })}`}

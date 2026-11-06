@@ -51,18 +51,24 @@ export function DashboardView({
 
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4">
-      <header className="flex flex-wrap items-center gap-3">
-        <h1 className="mr-auto text-lg font-semibold">Actions dashboard</h1>
-        <OwnerPicker owners={owners} value={owner} onChange={setOwner} />
-        <UpdatedAgo updatedAt={actions.updatedAt} now={now} />
-        <RefreshPicker
-          interval={interval}
-          loading={actions.loading}
-          onIntervalChange={setInterval}
-          onRefresh={() => void actions.refresh()}
-        />
-        <ThemeToggle />
-        <Button onClick={onSignOut}>Sign out</Button>
+      <header className="flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <h1 className="mr-auto text-lg font-semibold">Actions dashboard</h1>
+          <ThemeToggle />
+          <Button onClick={onSignOut}>Sign out</Button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <OwnerPicker owners={owners} value={owner} onChange={setOwner} />
+          <div className="ml-auto flex items-center gap-2">
+            <UpdatedAgo updatedAt={actions.updatedAt} now={now} />
+            <RefreshPicker
+              interval={interval}
+              loading={actions.loading}
+              onIntervalChange={setInterval}
+              onRefresh={() => void actions.refresh()}
+            />
+          </div>
+        </div>
       </header>
       <RateLimitNote
         rateLimit={actions.rateLimit}
